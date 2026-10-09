@@ -1,0 +1,5 @@
+services:
+  python-app:
+    image: python-docker-app
+    ports:
+      - "8000:8000"
