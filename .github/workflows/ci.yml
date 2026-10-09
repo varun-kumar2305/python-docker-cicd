@@ -16,6 +16,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Run application tests
+        run: python -m unittest discover -s tests -v
 
       - name: Build Docker image
         run: docker build -t python-docker-app .
