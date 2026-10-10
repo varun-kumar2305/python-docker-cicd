@@ -41,7 +41,9 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/python-docker-app:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/python-docker-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/python-docker-app:${{ github.sha }}
 
   deploy:
     needs: build-and-push
@@ -95,16 +97,17 @@ jobs:
 
       - name: Deploy application through Systems Manager
         run: |
+          IMAGE_TAG="${GITHUB_SHA}"
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "i-043773f0804065654" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy latest Python Docker application" \
-            --parameters 'commands=[
-              "set -e",
-              "sudo docker pull varunk2305/python-docker-app:latest",
-              "sudo docker rm -f python-app || true",
-              "sudo docker run -d --name python-app -p 80:8000 --restart unless-stopped varunk2305/python-docker-app:latest"
-            ]' \
+            --parameters "commands=[
+              \"set -e\",
+              \"sudo docker pull varunk2305/python-docker-app:${IMAGE_TAG}\",
+              \"sudo docker rm -f python-app || true\",
+              \"sudo docker run -d --name python-app -p 80:8000 --restart unless-stopped varunk2305/python-docker-app:${IMAGE_TAG}\"
+            ]" \
             --query 'Command.CommandId' \
             --output text)
 
