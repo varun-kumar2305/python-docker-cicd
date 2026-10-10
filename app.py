@@ -6,7 +6,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
         self.end_headers()
-        self.wfile.write(b"Hello from Docker Python App!")
+        self.wfile.write(b"Hello from Automated CI/CD Deployment!")
 
 
 if __name__ == "__main__":
