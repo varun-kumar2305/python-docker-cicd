@@ -52,6 +52,14 @@ jobs:
       id-token: write
 
     steps:
+      - name: Diagnose GitHub OIDC context
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Ref: $GITHUB_REF"
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "OIDC subject should be:"
+          echo "repo:${GITHUB_REPOSITORY}:ref:${GITHUB_REF}"
+          
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
