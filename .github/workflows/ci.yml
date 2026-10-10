@@ -59,6 +59,33 @@ jobs:
           echo "Event: $GITHUB_EVENT_NAME"
           echo "OIDC subject should be:"
           echo "repo:${GITHUB_REPOSITORY}:ref:${GITHUB_REF}"
+
+          
+      - name: Diagnose OIDC token claims
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TOKEN_URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com"
+
+          RESPONSE=$(curl -sSf \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$TOKEN_URL")
+
+          export OIDC_RESPONSE="$RESPONSE"
+
+          python - <<'PY'
+          import os, json, base64
+
+          response = json.loads(os.environ["OIDC_RESPONSE"])
+          token = response["value"]
+          payload = token.split(".")[1]
+          payload += "=" * (-len(payload) % 4)
+          claims = json.loads(base64.urlsafe_b64decode(payload))
+
+          for key in ("iss", "aud", "sub"):
+              print(f"{key}: {claims.get(key)}")
+          PY
           
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
