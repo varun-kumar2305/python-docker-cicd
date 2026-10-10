@@ -29,7 +29,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status, 200)
         self.assertEqual(
             response.read(),
-            b"Hello from Docker Python App!"
+            b"Hello from Automated CI/CD Deployment!"
         )
         connection.close()
 
